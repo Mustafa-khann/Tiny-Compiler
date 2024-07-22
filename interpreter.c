@@ -230,6 +230,11 @@ Value evaluateNode(Interpreter* interpreter, Node* node) {
     }
 }
 
+void interpret(Interpreter* interpreter, Node* program) {
+    Value result = evaluateNode(interpreter, program);
+    printValue(result);
+}
+
 void printValue(Value value) {
     switch(value.type) {
         case VALUE_INT:
@@ -242,9 +247,4 @@ void printValue(Value value) {
             printf("void\n");
             break;
     }
-}
-
-void interpret(Interpreter* interpreter, Node* program) {
-    Value result = evaluateNode(interpreter, program);
-    printValue(result);
 }
