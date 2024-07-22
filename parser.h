@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "lexer.h"  // Assuming there's a lexer.h file defining Token and TokenType
+#include "lexer.h"
 
 // Node types
 typedef enum {
@@ -19,11 +19,7 @@ typedef enum {
     NODE_UNARY,
     NODE_PRIMARY,
     NODE_ASSIGNMENT,
-    NODE_LITERAL,
-    NODE_EXPRESSSION,
-    NODE_STATEMENT,
-    NODE_EXPRESSION
-
+    NODE_LITERAL
 } NodeType;
 
 // Forward declaration of Node

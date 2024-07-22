@@ -20,7 +20,7 @@ static void errorAt(Parser* parser, Token* token, const char* message) {
         }
     else
         {
-            fprintf(stderr, " at '%.*s'", token->lexeme, token->column);
+            fprintf(stderr, " at '%s'", token->lexeme);
         }
    fprintf(stderr, ": %s\n", message);
     parser->hadError = 1;
@@ -264,31 +264,31 @@ static Node* ifStatement(Parser* parser){
         }
     return node;
 }
-
-static Node* whileStatement(Parser* parser){
+static Node* whileStatement(Parser* parser) {
     Node* node = createNode(NODE_WHILE_STATEMENT);
 
     consume(parser, TOKEN_LPAREN, "Expect '(' after 'while'.");
     node->as.while_statement.condition = expression(parser);
+    consume(parser, TOKEN_RPAREN, "Expect ')' after while condition.");
 
     node->as.while_statement.body = statement(parser);
 
     return node;
 }
 
-static Node* returnStatement(Parser* parser){
+static Node* returnStatement(Parser* parser) {
     Node* node = createNode(NODE_RETURN_STATEMENT);
     node->token = parser->previous;
 
     if(!check(parser, TOKEN_SEMICOLON)) {
-        node->as.return_statement.expression = expressionStatement(parser);
+        node->as.return_statement.expression = expression(parser);
     }
 
-    consume(parser, TOKEN_SEMICOLON, "Expect ';' after return value;");
+    consume(parser, TOKEN_SEMICOLON, "Expect ';' after return value.");
     return node;
 }
 
-static Node* varDeclaration(Parser* parser){
+static Node* varDeclaration(Parser* parser) {
     Node* node = createNode(NODE_VARIABLE_DECLARATION);
 
     node->as.variable_declaration.type = createNode(NODE_TYPE);
@@ -298,10 +298,9 @@ static Node* varDeclaration(Parser* parser){
     node->as.variable_declaration.identifier = createNode(NODE_IDENTIFIER);
     node->as.variable_declaration.identifier->token = parser->previous;
 
-    if(match(parser, TOKEN_ASSIGN)){
+    if(match(parser, TOKEN_ASSIGN)) {
         node->as.variable_declaration.initializer = expression(parser);
-    }
-    else {
+    } else {
         node->as.variable_declaration.initializer = NULL;
     }
 
@@ -309,7 +308,7 @@ static Node* varDeclaration(Parser* parser){
     return node;
 }
 
-static Node* funDeclaration(Parser* parser){
+static Node* funDeclaration(Parser* parser) {
     Node* node = createNode(NODE_FUNCTION_DECLARATION);
 
     node->as.function_declaration.type = createNode(NODE_TYPE);
@@ -325,20 +324,20 @@ static Node* funDeclaration(Parser* parser){
     node->as.function_declaration.parameter_count = 0;
 
     if(!check(parser, TOKEN_RPAREN)) {
-        do{
-            if(node->as.function_declaration.parameter_count>=255){
+        do {
+            if(node->as.function_declaration.parameter_count >= 255) {
                 error(parser, "Can't have more than 255 parameters.");
             }
 
             node->as.function_declaration.parameter_count++;
-            node->as.function_declaration.parameters = realloc(node->as.function_declaration.parameters, node->as.function_declaration.parameter_count * sizeof(Node*));
+            node->as.function_declaration.parameters = realloc(node->as.function_declaration.parameters,
+                                                               node->as.function_declaration.parameter_count * sizeof(Node*));
 
             Node* param = createNode(NODE_VARIABLE_DECLARATION);
-            if(match(parser, TOKEN_INT) || match(parser, TOKEN_FLOAT)){
+            if(match(parser, TOKEN_INT) || match(parser, TOKEN_FLOAT)) {
                 param->as.variable_declaration.type = createNode(NODE_TYPE);
                 param->as.variable_declaration.type->token = parser->previous;
-            }
-            else {
+            } else {
                 error(parser, "Expect parameter type.");
             }
 
@@ -347,8 +346,7 @@ static Node* funDeclaration(Parser* parser){
             param->as.variable_declaration.identifier->token = parser->previous;
 
             node->as.function_declaration.parameters[node->as.function_declaration.parameter_count - 1] = param;
-        }
-        while(match(parser, TOKEN_COMMA));
+        } while(match(parser, TOKEN_COMMA));
     }
     consume(parser, TOKEN_RPAREN, "Expect ')' after parameters.");
     consume(parser, TOKEN_LBRACE, "Expect '{' before function body.");
@@ -357,34 +355,47 @@ static Node* funDeclaration(Parser* parser){
 }
 
 static void synchronize(Parser* parser) {
-    parser -> panicMode = 0;
+    parser->panicMode = 0;
 
-    while(parser->current.type != TOKEN_EOF){
+    while(parser->current.type != TOKEN_EOF) {
         if(parser->previous.type == TOKEN_SEMICOLON) return;
-        switch(parser->current.type)
-        {
+        switch(parser->current.type) {
             case TOKEN_INT:
             case TOKEN_FLOAT:
             case TOKEN_IF:
             case TOKEN_WHILE:
             case TOKEN_RETURN:
-            return;
+                return;
             default:
-            ;
+                ;
         }
         advance(parser);
     }
 }
 
-static Node* declaration(Parser* parser)
-{
+static Node* statement(Parser* parser) {
+    if(match(parser, TOKEN_IF)) {
+        return ifStatement(parser);
+    }
+    if(match(parser, TOKEN_WHILE)) {
+        return whileStatement(parser);
+    }
+    if(match(parser, TOKEN_RETURN)) {
+        return returnStatement(parser);
+    }
+    if(match(parser, TOKEN_LBRACE)) {
+        return blockStatement(parser);
+    }
+    return expressionStatement(parser);
+}
+
+static Node* declaration(Parser* parser) {
     if(match(parser, TOKEN_INT) || match(parser, TOKEN_FLOAT)) {
         if(check(parser, TOKEN_IDENTIFIER) &&
-            parser->lexer->current[0] == '(' &&
-            parser->lexer->current[1] == ')') {
-                return funDeclaration(parser);
-        }
-        else {
+           parser->lexer->current[0] == '(' &&
+           parser->lexer->current[1] == ')') {
+            return funDeclaration(parser);
+        } else {
             return varDeclaration(parser);
         }
     }
@@ -394,13 +405,12 @@ static Node* declaration(Parser* parser)
     return stmt;
 }
 
-
-Node* parseProgram(Parser* parser){
+Node* parseProgram(Parser* parser) {
     Node* program = createNode(NODE_PROGRAM);
     program->as.program.declarations = NULL;
     program->as.program.declaration_count = 0;
 
-    while (!match(parser, TOKEN_EOF)){
+    while (!match(parser, TOKEN_EOF)) {
         Node* decl = declaration(parser);
         if(decl) {
             program->as.program.declaration_count++;
@@ -413,7 +423,7 @@ Node* parseProgram(Parser* parser){
     return program;
 }
 
-void initParser(Parser* parser, Lexer* lexer){
+void initParser(Parser* parser, Lexer* lexer) {
     parser->lexer = lexer;
     parser->hadError = 0;
     parser->panicMode = 0;

@@ -1,0 +1,19 @@
+int x;
+x = 5;
+int y = 3;
+float z = 2.5;
+
+int result = (x + y) * z;
+
+if (result > 20) {
+    int bonus = 10;
+    result = result + bonus;
+}
+
+while (result > 0) {
+    result = result - 1;
+}
+
+float final = result / 2.0;
+
+return final;

@@ -9,13 +9,11 @@ typedef enum {
     TOKEN_ELSE,
     TOKEN_WHILE,
     TOKEN_RETURN,
-
     // Identifiers and literals
     TOKEN_IDENTIFIER,
     TOKEN_INTEGER_LITERAL,
     TOKEN_FLOAT_LITERAL,
-
-    // operators
+    // Operators
     TOKEN_PLUS,
     TOKEN_MINUS,
     TOKEN_ASTERISK,
@@ -28,21 +26,17 @@ typedef enum {
     TOKEN_LESS_EQUAL,
     TOKEN_GREATER,
     TOKEN_GREATER_EQUAL,
-
-
-    // logical operators
+    // Logical operators
     TOKEN_AND,
     TOKEN_OR,
-
-    // punctuation
+    // Punctuation
     TOKEN_SEMICOLON,
     TOKEN_COMMA,
     TOKEN_LPAREN,
     TOKEN_RPAREN,
     TOKEN_LBRACE,
     TOKEN_RBRACE,
-
-    // special tokens
+    // Special tokens
     TOKEN_EOF,
     TOKEN_ERROR
 } TokenType;

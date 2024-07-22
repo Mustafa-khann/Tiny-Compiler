@@ -14,7 +14,7 @@ typedef struct {
     union {
         int int_value;
         float float_value;
-    } as ;
+    } as;
 } Value;
 
 typedef struct {
@@ -26,15 +26,16 @@ typedef struct Environment {
     Variable* variables;
     int variable_count;
     struct Environment* enclosing;
-}Environment;
+} Environment;
 
 typedef struct {
     Environment* global_env;
     Environment* current_env;
-}Interpreter;
+} Interpreter;
 
 void initInterpreter(Interpreter* interpreter);
 void interpret(Interpreter* interpreter, Node* program);
 Value evaluateNode(Interpreter* interpreter, Node* node);
+void printValue(Value value);
 
 #endif
