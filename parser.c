@@ -23,7 +23,7 @@ static void errorAt(Parser* parser, Token* token, const char* message) {
             fprintf(stderr, " at '%s'", token->lexeme);
         }
    fprintf(stderr, ": %s\n", message);
-    parser->hadError = 1;
+    parser->hadError = 1
 }
 
 
