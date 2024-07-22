@@ -38,7 +38,7 @@ TinyCompiler is a simple compiler implementation written in C. It includes a lex
 Run the compiler on a source file:
 
 ```
-./tinycompiler path/to/your/source/file.tc
+./tinycompiler script.tc
 ```
 
 ## Project Structure
