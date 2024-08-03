@@ -1,4 +1,4 @@
-# TinyCompiler
+# Tiny Compiler
 
 TinyCompiler is a simple compiler implementation written in C. It includes a lexer, parser, and interpreter for a basic programming language.
 
